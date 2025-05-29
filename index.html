@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>🔴 EN DIRECT</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: black;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #video {
+      margin-top: 10px;
+      width: 90%;
+      max-width: 600px;
+      height: auto;
+      background: #000;
+    }
+    #overlay {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: red;
+      color: white;
+      padding: 4px 10px;
+      font-weight: bold;
+      border-radius: 5px;
+    }
+    #viewers {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 4px 10px;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    #comments {
+      margin-top: 10px;
+      width: 90%;
+      max-width: 600px;
+      background: #111;
+      padding: 10px;
+      height: 200px;
+      overflow: hidden;
+      font-size: 14px;
+      border-radius: 10px;
+    }
+    .comment {
+      margin-bottom: 5px;
+    }
+    .don {
+      color: gold;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div id="overlay">🔴 EN DIRECT</div>
+  <div id="viewers">👁️ 10 024 392</div>
+  <video id="video" autoplay muted playsinline></video>
+  <div id="comments"></div>
+
+  <script>
+    // Accès à la webcam
+    const video = document.getElementById('video');
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+      .then(stream => {
+        video.srcObject = stream;
+      });
+
+    // Faux commentaires en boucle
+    const comments = [
+      "💬 [Fan_53] : Je t'aime trop 😭😭",
+      "💬 [BigViewer88] : T’es une légende 🔥",
+      "💸 [MegaDonateur] t’a envoyé 500€ 💰",
+      "💬 [Bestie2025] : Trop fort ce live !",
+      "💸 [Anonyme] t’a envoyé 2000€ ! 😱",
+      "💬 [ZoeLove] : Tu mérites 10M de fans",
+      "💬 [Alpha2024] : Qui regarde avec moi ? 🙋‍♂️",
+      "💸 [KingMoney] t’a envoyé 1000€ 💸",
+      "💬 [ViewerX] : C’est fou ce moment omg",
+    ];
+
+    const commentBox = document.getElementById('comments');
+    let index = 0;
+
+    function addComment() {
+      const div = document.createElement('div');
+      div.className = 'comment';
+      div.innerHTML = comments[index];
+      if (comments[index].includes('💸')) {
+        div.classList.add('don');
+      }
+      commentBox.appendChild(div);
+      if (commentBox.children.length > 20) {
+        commentBox.removeChild(commentBox.firstChild);
+      }
+      commentBox.scrollTop = commentBox.scrollHeight;
+      index = (index + 1) % comments.length;
+    }
+
+    setInterval(addComment, 800);
+  </script>
+</body>
+</html>
+
