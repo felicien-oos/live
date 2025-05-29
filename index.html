@@ -3,21 +3,36 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Fake Live avec Caméra Plein Écran + Mini Commentaires</title>
+<title>Live YouTube Fake - Prank</title>
 <style>
-  html, body {
-    margin: 0; padding: 0; height: 100%;
-    background: #000;
-    overflow: hidden;
+  * {
+    box-sizing: border-box;
+  }
+  body, html {
+    margin: 0; padding: 0;
+    height: 100vh;
+    width: 100vw;
     font-family: Arial, sans-serif;
-    color: #fff;
+    background: white;
+    overflow: hidden;
+    color: #000;
   }
   #container {
-    position: relative;
-    width: 100vw;
+    display: flex;
     height: 100vh;
+    width: 100vw;
   }
-  video {
+  #left {
+    position: relative;
+    width: 50vw;
+    height: 100vh;
+    background: #222;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+  #left video#main-webcam {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -26,179 +41,236 @@
     position: absolute;
     top: 15px;
     left: 15px;
-    background: red;
-    color: white;
-    font-weight: bold;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 16px;
-    user-select: none;
-    z-index: 10;
-    box-shadow: 0 0 8px #d40000;
-  }
-
-  #top-right-panel {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: #fff; /* blanc */
-    border-radius: 12px;
-    padding: 10px 14px;
-    width: 320px;
-    max-height: 200px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    box-sizing: border-box;
-    font-size: 14px;
-    user-select: none;
-    box-shadow: 0 0 12px rgba(0,0,0,0.3);
-    color: #222; /* texte sombre */
-  }
-
-  #counters {
-    display: flex;
-    justify-content: space-between;
-    font-weight: 700;
-    font-size: 16px;
-    color: #222;
-  }
-  #counters span {
     display: flex;
     align-items: center;
-    gap: 6px;
+    font-weight: bold;
+    font-size: 18px;
+    color: white;
+    user-select: none;
+    z-index: 10;
   }
-  #counters span svg {
-    width: 18px;
-    height: 18px;
-    fill: #ff4444;
+  #live-dot {
+    width: 14px;
+    height: 14px;
+    background: red;
+    border-radius: 50%;
+    margin-right: 8px;
+    animation: blink 1.2s infinite;
+  }
+  @keyframes blink {
+    0%, 50%, 100% { opacity: 1; }
+    25%, 75% { opacity: 0; }
+  }
+
+  #right {
+    position: relative;
+    width: 50vw;
+    height: 100vh;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 15px 10px 15px;
+    overflow: hidden;
+    border-left: 1px solid #ddd;
+  }
+
+  #stats {
+    display: flex;
+    justify-content: flex-start;
+    gap: 25px;
+    font-weight: bold;
+    font-size: 17px;
+    margin-bottom: 12px;
+    color: #333;
+    user-select: none;
+  }
+  #stats > div {
+    white-space: nowrap;
   }
 
   #comments {
     flex-grow: 1;
     overflow-y: auto;
-    max-height: 130px;
-    color: #222;
-    font-size: 13px;
-    line-height: 1.3;
-    border-top: 1px solid #ccc;
-    padding-top: 8px;
+    padding-right: 10px;
   }
   .comment {
-    margin-bottom: 6px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    background: #f9f9f9;
+    margin-bottom: 8px;
+    padding: 8px 12px;
+    border-radius: 7px;
+    font-size: 14px;
+    line-height: 1.3;
+    color: #111;
   }
-  .don {
-    color: #b97f00;
-    font-weight: 700;
+
+  /* Petite webcam en bas à droite, devant la zone commentaires */
+  #bottom-right-webcam {
+    position: fixed;
+    bottom: 12px;
+    right: 12px;
+    width: 210px;
+    height: 130px;
+    border: 3px solid white;
+    box-shadow: 0 0 14px rgba(0,0,0,0.7);
+    overflow: hidden;
+    background: #222;
+    z-index: 20;
+  }
+  #bottom-right-webcam video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Scrollbar discrète pour les commentaires */
+  #comments::-webkit-scrollbar {
+    width: 6px;
+  }
+  #comments::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 3px;
   }
 </style>
 </head>
 <body>
 
 <div id="container">
-  <video id="video" autoplay muted playsinline></video>
-  <div id="live-badge">🔴 EN DIRECT</div>
-
-  <div id="top-right-panel">
-    <div id="counters">
-      <span id="viewers-count">👁️ 1 000 vues</span>
-      <span id="likes-count">❤️ 100 likes</span>
+  <div id="left">
+    <video id="main-webcam" autoplay muted loop playsinline>
+      <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm" type="video/webm" />
+      <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4" />
+    </video>
+    <div id="live-badge">
+      <div id="live-dot"></div>EN DIRECT
     </div>
-    <div id="comments"></div>
+  </div>
+
+  <div id="right">
+    <div id="stats">
+      <div id="views">1 000 vues</div>
+      <div id="likes">1 000 likes</div>
+    </div>
+    <div id="comments" aria-live="polite" aria-relevant="additions">
+      <!-- commentaires insérés ici -->
+    </div>
   </div>
 </div>
 
-<script>
-  // Accès webcam
-  const video = document.getElementById('video');
-  navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-    .then(stream => { video.srcObject = stream; })
-    .catch(() => {
-      video.poster = "https://via.placeholder.com/800x600?text=Webcam+indisponible";
-    });
+<div id="bottom-right-webcam">
+  <video autoplay muted loop playsinline>
+    <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm" type="video/webm" />
+    <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4" />
+  </video>
+</div>
 
-  // Données commentaires/dons simulés
+<script>
+  // Les 30 commentaires fixes à faire défiler en boucle
   const commentsList = [
-    "💬 [Fan_53] : Je t'adore, c'est fou !",
-    "💬 [BigViewer88] : Légendaire 🔥🔥🔥",
-    "💸 [MegaDonateur] t'a envoyé 500€ 💰",
-    "💬 [Bestie2025] : Trop drôle ce prank 😂",
-    "💸 [Anonyme] a donné 2000€ ! 😱",
-    "💬 [ZoeLove] : 10M de fans, c’est certain !",
-    "💬 [Alpha2024] : Qui est là avec moi ? 🙌",
-    "💸 [KingMoney] a donné 1000€ 💸",
-    "💬 [ViewerX] : Ce moment est incroyable !",
+    "Super vidéo !",
+    "Trop drôle ce prank 😂",
+    "Je regarde en direct !",
+    "C'est génial, continue comme ça !",
+    "Trop fort, j'adore",
+    "Encore une vidéo comme ça stp !",
+    "GG pour le live 👍",
+    "Comment tu fais ça ?",
+    "Ça me fait trop rire 😂",
+    "Je suis abonné depuis longtemps",
+    "Ça chauffe ici 🔥",
+    "Lâche un like si t'es là !",
+    "Tu vas faire d’autres pranks ?",
+    "Trop cool la caméra !",
+    "On veut voir plus !",
+    "Top la qualité vidéo",
+    "Le son est nickel",
+    "Quelle ambiance !",
+    "C’est un fake ? Trop réaliste",
+    "J’adore ce format live",
+    "On te soutient à fond !",
+    "Faut que tu continues ça !",
+    "Je suis fan de ta chaîne",
+    "On veut plus de contenu comme ça",
+    "C’est trop bien fait",
+    "Le prank est énorme",
+    "Tu déchires tout !",
+    "C’est du lourd ce live",
+    "Trop impatient de la suite",
+    "Je kiffe ce que tu fais !"
   ];
 
   const commentsContainer = document.getElementById('comments');
-  const viewersElement = document.getElementById('viewers-count');
-  const likesElement = document.getElementById('likes-count');
 
-  let commentIdx = 0;
-  let viewers = 1000;
-  let likes = 100;
-  const maxViewers = 5000000;
-  const maxLikes = 1700000;
-
-  // Formatage nombre avec espaces
-  function formatNumber(n) {
-    return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-  }
-
-  // Vitesse d'augmentation qui accélère plus vite
-  let viewerIncrementInterval = 300; // ms initial
-  let likeIncrementInterval = 400;   // ms initial
-
-  function increaseViewers() {
-    if (viewers < maxViewers) {
-      viewers++;
-      viewersElement.textContent = `👁️ ${formatNumber(viewers)} vues`;
-      // Accélération plus rapide en réduisant intervalle
-      if (viewerIncrementInterval > 15) {
-        viewerIncrementInterval -= 10;
-        clearInterval(viewersTimer);
-        viewersTimer = setInterval(increaseViewers, viewerIncrementInterval);
-      }
+  // On insère tous les commentaires en boucle, 2 fois pour que le scroll soit fluide
+  function initComments() {
+    for (let i=0; i<2; i++) {
+      commentsList.forEach(text => {
+        const div = document.createElement('div');
+        div.className = 'comment';
+        div.textContent = text;
+        commentsContainer.appendChild(div);
+      });
     }
   }
 
-  function increaseLikes() {
-    if (likes < maxLikes) {
-      likes++;
-      likesElement.textContent = `❤️ ${formatNumber(likes)} likes`;
-      // Accélération plus rapide en réduisant intervalle
-      if (likeIncrementInterval > 15) {
-        likeIncrementInterval -= 10;
-        clearInterval(likesTimer);
-        likesTimer = setInterval(increaseLikes, likeIncrementInterval);
-      }
+  // Scroll vertical des commentaires (auto)
+  function autoScroll() {
+    commentsContainer.scrollTop += 1;
+    // Quand on arrive en bas, on revient en haut
+    if (commentsContainer.scrollTop >= commentsContainer.scrollHeight / 2) {
+      commentsContainer.scrollTop = 0;
     }
   }
 
-  // Ajout de commentaires
-  function addComment() {
-    const div = document.createElement('div');
-    div.className = 'comment';
-    div.textContent = commentsList[commentIdx];
-    if (commentsList[commentIdx].includes('💸')) {
-      div.classList.add('don');
-    }
-    commentsContainer.appendChild(div);
+  initComments();
+  setInterval(autoScroll, 80);
 
-    if (commentsContainer.children.length > 10) {
-      commentsContainer.removeChild(commentsContainer.firstChild);
-    }
-    commentsContainer.scrollTop = commentsContainer.scrollHeight;
+  // Gestion des vues et likes avec accélération et sauts
 
-    commentIdx = (commentIdx + 1) % commentsList.length;
+  const viewsElem = document.getElementById('views');
+  const likesElem = document.getElementById('likes');
+
+  // Valeurs initiales
+  let views = 1000;
+  let likes = 1000;
+
+  function updateViews() {
+    if (views < 25000) {
+      // Lent, +1 à +3
+      views += Math.floor(Math.random() * 3) + 1;
+    } else if (views >= 25000 && views < 40000) {
+      // Saut rapide
+      views += 15000;
+    } else if (views >= 40000 && views < 50000) {
+      views += 3000;
+    } else if (views >= 50000 && views < 100000) {
+      views += 10000;
+    } else if (views >= 100000 && views < 1000000) {
+      views += 50000;
+    } else if (views >= 1000000 && views < 2065000) {
+      views += 10000;
+    } else if (views >= 2065000 && views < 10000000) {
+      views += 100000;
+    }
+    if (views > 10000000) views = 10000000;
   }
 
-  let viewersTimer = setInterval(increaseViewers, viewerIncrementInterval);
-  let likesTimer = setInterval(increaseLikes, likeIncrementInterval);
-  setInterval(addComment, 1200);
+  function updateLikes() {
+    if (likes < 10000) {
+      likes += Math.floor(Math.random() * 3) + 1;
+    } else if (likes >= 10000 && likes < 2000000) {
+      likes += Math.floor(Math.random() * 50000) + 10000;
+    }
+    if (likes > 2000000) likes = 2000000;
+  }
+
+  function updateStats() {
+    updateViews();
+    updateLikes();
+    viewsElem.textContent = views.toLocaleString('fr-FR') + " vues";
+    likesElem.textContent = likes.toLocaleString('fr-FR') + " likes";
+  }
+
+  setInterval(updateStats, 1500);
 
 </script>
 
