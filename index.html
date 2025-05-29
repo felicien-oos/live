@@ -87,7 +87,8 @@
       "MDR ce moment", "C'est trop !", "Big like !", "Je partage !", "Abonné direct",
       "Force à toi !", "Live de fou !", "Trop drôle", "Tu m'as tué 😂",
       "Le son est trop bien", "Replay quand ?", "Tu mérites plus de vues !",
-      "T'es une légende", "Je like sans hésiter", "C'est validé 🔥", "Le roi du live"
+      "T'es une légende", "Je like sans hésiter", "C'est validé 🔥", "Le roi du live",
+      "Encore en live ?"
     ];
 
     const listeCommentaires = document.getElementById('liste-commentaires');
@@ -104,20 +105,20 @@
     }
     setInterval(ajouterCommentaire, 1000);
 
-    // Compteurs avec accélération progressive
+    // Compteurs avec accélération douce
     let vues = 0;
     let likes = 0;
-    let vueSpeed = 1;
-    let likeSpeed = 1;
 
     function updateStats() {
-      if (vues < 25000) vues += vueSpeed;
+      // VUES
+      if (vues < 25000) vues += Math.ceil(vues * 0.01 + 1); // progressif jusqu'à 25k
       else if (vues < 100000) vues += 1000;
       else if (vues < 2065000) vues += 50000;
       else if (vues < 10000000) vues += 100000;
       else vues = 10000000;
 
-      if (likes < 10000) likes += likeSpeed;
+      // LIKES
+      if (likes < 10000) likes += Math.ceil(likes * 0.015 + 1); // progressif jusqu'à 10k
       else if (likes < 100000) likes += 2000;
       else if (likes < 2000000) likes += 10000;
       else likes = 2000000;
@@ -129,3 +130,4 @@
   </script>
 </body>
 </html>
+
