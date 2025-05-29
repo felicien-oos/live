@@ -103,8 +103,8 @@
 
   <div id="top-right-panel">
     <div id="counters">
-      <span id="viewers-count">👁️ 1 000</span>
-      <span id="likes-count">❤️ 100</span>
+      <span id="viewers-count">👁️ 1 000 vues</span>
+      <span id="likes-count">❤️ 100 likes</span>
     </div>
     <div id="comments"></div>
   </div>
@@ -142,25 +142,38 @@
   const maxViewers = 5000000;
   const maxLikes = 1700000;
 
-  // Fonction formatage nombre avec espaces
+  // Formatage nombre avec espaces
   function formatNumber(n) {
     return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
   }
 
-  // Incrémentation progressives
-  function increaseCounters() {
+  // Vitesse d'augmentation qui accélère un peu
+  let viewerIncrementInterval = 1000; // ms
+  let likeIncrementInterval = 1200;   // ms
+
+  function increaseViewers() {
     if (viewers < maxViewers) {
-      // Ajoute un peu plus de vues au début, puis moins pour ralentir vers la fin
-      const incr = Math.floor(Math.random() * 10000) + 500;
-      viewers += incr;
-      if (viewers > maxViewers) viewers = maxViewers;
-      viewersElement.textContent = "👁️ " + formatNumber(viewers);
+      viewers++;
+      viewersElement.textContent = `👁️ ${formatNumber(viewers)} vues`;
+      // Accélération lente en réduisant intervalle
+      if (viewerIncrementInterval > 20) {
+        viewerIncrementInterval -= 1;
+        clearInterval(viewersTimer);
+        viewersTimer = setInterval(increaseViewers, viewerIncrementInterval);
+      }
     }
+  }
+
+  function increaseLikes() {
     if (likes < maxLikes) {
-      const incrLikes = Math.floor(Math.random() * 700) + 30;
-      likes += incrLikes;
-      if (likes > maxLikes) likes = maxLikes;
-      likesElement.textContent = "❤️ " + formatNumber(likes);
+      likes++;
+      likesElement.textContent = `❤️ ${formatNumber(likes)} likes`;
+      // Accélération lente en réduisant intervalle
+      if (likeIncrementInterval > 20) {
+        likeIncrementInterval -= 1;
+        clearInterval(likesTimer);
+        likesTimer = setInterval(increaseLikes, likeIncrementInterval);
+      }
     }
   }
 
@@ -182,8 +195,9 @@
     commentIdx = (commentIdx + 1) % commentsList.length;
   }
 
+  let viewersTimer = setInterval(increaseViewers, viewerIncrementInterval);
+  let likesTimer = setInterval(increaseLikes, likeIncrementInterval);
   setInterval(addComment, 1200);
-  setInterval(increaseCounters, 2000);
 
 </script>
 
