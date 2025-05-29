@@ -41,7 +41,7 @@
     position: absolute;
     top: 15px;
     right: 15px;
-    background: rgba(0,0,0,0.6);
+    background: #fff; /* blanc */
     border-radius: 12px;
     padding: 10px 14px;
     width: 320px;
@@ -52,7 +52,8 @@
     box-sizing: border-box;
     font-size: 14px;
     user-select: none;
-    box-shadow: 0 0 12px rgba(255,255,255,0.3);
+    box-shadow: 0 0 12px rgba(0,0,0,0.3);
+    color: #222; /* texte sombre */
   }
 
   #counters {
@@ -60,7 +61,7 @@
     justify-content: space-between;
     font-weight: 700;
     font-size: 16px;
-    color: #e0e0e0;
+    color: #222;
   }
   #counters span {
     display: flex;
@@ -77,10 +78,10 @@
     flex-grow: 1;
     overflow-y: auto;
     max-height: 130px;
-    color: #ddd;
+    color: #222;
     font-size: 13px;
     line-height: 1.3;
-    border-top: 1px solid #555;
+    border-top: 1px solid #ccc;
     padding-top: 8px;
   }
   .comment {
@@ -90,7 +91,7 @@
     text-overflow: ellipsis;
   }
   .don {
-    color: #f4b942;
+    color: #b97f00;
     font-weight: 700;
   }
 </style>
@@ -147,17 +148,17 @@
     return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
   }
 
-  // Vitesse d'augmentation qui accélère un peu
-  let viewerIncrementInterval = 1000; // ms
-  let likeIncrementInterval = 1200;   // ms
+  // Vitesse d'augmentation qui accélère plus vite
+  let viewerIncrementInterval = 300; // ms initial
+  let likeIncrementInterval = 400;   // ms initial
 
   function increaseViewers() {
     if (viewers < maxViewers) {
       viewers++;
       viewersElement.textContent = `👁️ ${formatNumber(viewers)} vues`;
-      // Accélération lente en réduisant intervalle
-      if (viewerIncrementInterval > 20) {
-        viewerIncrementInterval -= 1;
+      // Accélération plus rapide en réduisant intervalle
+      if (viewerIncrementInterval > 15) {
+        viewerIncrementInterval -= 10;
         clearInterval(viewersTimer);
         viewersTimer = setInterval(increaseViewers, viewerIncrementInterval);
       }
@@ -168,9 +169,9 @@
     if (likes < maxLikes) {
       likes++;
       likesElement.textContent = `❤️ ${formatNumber(likes)} likes`;
-      // Accélération lente en réduisant intervalle
-      if (likeIncrementInterval > 20) {
-        likeIncrementInterval -= 1;
+      // Accélération plus rapide en réduisant intervalle
+      if (likeIncrementInterval > 15) {
+        likeIncrementInterval -= 10;
         clearInterval(likesTimer);
         likesTimer = setInterval(increaseLikes, likeIncrementInterval);
       }
