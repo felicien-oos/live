@@ -1,278 +1,131 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Live YouTube Fake - Prank</title>
-<style>
-  * {
-    box-sizing: border-box;
-  }
-  body, html {
-    margin: 0; padding: 0;
-    height: 100vh;
-    width: 100vw;
-    font-family: Arial, sans-serif;
-    background: white;
-    overflow: hidden;
-    color: #000;
-  }
-  #container {
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-  }
-  #left {
-    position: relative;
-    width: 50vw;
-    height: 100vh;
-    background: #222;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-  }
-  #left video#main-webcam {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  #live-badge {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    display: flex;
-    align-items: center;
-    font-weight: bold;
-    font-size: 18px;
-    color: white;
-    user-select: none;
-    z-index: 10;
-  }
-  #live-dot {
-    width: 14px;
-    height: 14px;
-    background: red;
-    border-radius: 50%;
-    margin-right: 8px;
-    animation: blink 1.2s infinite;
-  }
-  @keyframes blink {
-    0%, 50%, 100% { opacity: 1; }
-    25%, 75% { opacity: 0; }
-  }
-
-  #right {
-    position: relative;
-    width: 50vw;
-    height: 100vh;
-    background: white;
-    display: flex;
-    flex-direction: column;
-    padding: 10px 15px 10px 15px;
-    overflow: hidden;
-    border-left: 1px solid #ddd;
-  }
-
-  #stats {
-    display: flex;
-    justify-content: flex-start;
-    gap: 25px;
-    font-weight: bold;
-    font-size: 17px;
-    margin-bottom: 12px;
-    color: #333;
-    user-select: none;
-  }
-  #stats > div {
-    white-space: nowrap;
-  }
-
-  #comments {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding-right: 10px;
-  }
-  .comment {
-    background: #f9f9f9;
-    margin-bottom: 8px;
-    padding: 8px 12px;
-    border-radius: 7px;
-    font-size: 14px;
-    line-height: 1.3;
-    color: #111;
-  }
-
-  /* Petite webcam en bas à droite, devant la zone commentaires */
-  #bottom-right-webcam {
-    position: fixed;
-    bottom: 12px;
-    right: 12px;
-    width: 210px;
-    height: 130px;
-    border: 3px solid white;
-    box-shadow: 0 0 14px rgba(0,0,0,0.7);
-    overflow: hidden;
-    background: #222;
-    z-index: 20;
-  }
-  #bottom-right-webcam video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  /* Scrollbar discrète pour les commentaires */
-  #comments::-webkit-scrollbar {
-    width: 6px;
-  }
-  #comments::-webkit-scrollbar-thumb {
-    background-color: rgba(0,0,0,0.2);
-    border-radius: 3px;
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>Live avec Caméra</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: black;
+    }
+    #webcam {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: 1;
+    }
+    #en-direct {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: red;
+      color: white;
+      padding: 4px 10px;
+      font-weight: bold;
+      border-radius: 4px;
+      font-family: sans-serif;
+      z-index: 3;
+    }
+    #commentaires {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 300px;
+      max-height: 90vh;
+      background: white;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.3);
+      font-family: sans-serif;
+      z-index: 2;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    #stats {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+    #liste-commentaires {
+      flex-grow: 1;
+      overflow: hidden;
+    }
+    .comment {
+      padding: 4px 0;
+      border-bottom: 1px solid #eee;
+    }
+  </style>
 </head>
 <body>
-
-<div id="container">
-  <div id="left">
-    <video id="main-webcam" autoplay muted loop playsinline>
-      <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm" type="video/webm" />
-      <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4" />
-    </video>
-    <div id="live-badge">
-      <div id="live-dot"></div>EN DIRECT
-    </div>
-  </div>
-
-  <div id="right">
+  <video id="webcam" autoplay muted playsinline></video>
+  <div id="en-direct">● EN DIRECT</div>
+  <div id="commentaires">
     <div id="stats">
-      <div id="views">1 000 vues</div>
-      <div id="likes">1 000 likes</div>
+      <div id="vues">Vues : 0</div>
+      <div id="likes">Likes : 0</div>
     </div>
-    <div id="comments" aria-live="polite" aria-relevant="additions">
-      <!-- commentaires insérés ici -->
-    </div>
+    <div id="liste-commentaires"></div>
   </div>
-</div>
 
-<div id="bottom-right-webcam">
-  <video autoplay muted loop playsinline>
-    <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm" type="video/webm" />
-    <source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4" />
-  </video>
-</div>
+  <script>
+    // Webcam
+    const video = document.getElementById('webcam');
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+      .then(stream => video.srcObject = stream)
+      .catch(err => console.error('Erreur caméra :', err));
 
-<script>
-  // Les 30 commentaires fixes à faire défiler en boucle
-  const commentsList = [
-    "Super vidéo !",
-    "Trop drôle ce prank 😂",
-    "Je regarde en direct !",
-    "C'est génial, continue comme ça !",
-    "Trop fort, j'adore",
-    "Encore une vidéo comme ça stp !",
-    "GG pour le live 👍",
-    "Comment tu fais ça ?",
-    "Ça me fait trop rire 😂",
-    "Je suis abonné depuis longtemps",
-    "Ça chauffe ici 🔥",
-    "Lâche un like si t'es là !",
-    "Tu vas faire d’autres pranks ?",
-    "Trop cool la caméra !",
-    "On veut voir plus !",
-    "Top la qualité vidéo",
-    "Le son est nickel",
-    "Quelle ambiance !",
-    "C’est un fake ? Trop réaliste",
-    "J’adore ce format live",
-    "On te soutient à fond !",
-    "Faut que tu continues ça !",
-    "Je suis fan de ta chaîne",
-    "On veut plus de contenu comme ça",
-    "C’est trop bien fait",
-    "Le prank est énorme",
-    "Tu déchires tout !",
-    "C’est du lourd ce live",
-    "Trop impatient de la suite",
-    "Je kiffe ce que tu fais !"
-  ];
+    // Données fake
+    const commentaires = [
+      "Trop fort !", "J'adore cette vibe", "C'est du lourd !", "🔥🔥🔥", "T'es en feu !",
+      "C'est incroyable", "Respect", "Continue comme ça !", "Tu mérites 1M !",
+      "Le Real va t'appeler !", "On adore !", "Incroyable montage", "La qualité omg",
+      "MDR ce moment", "C'est trop !", "Big like !", "Je partage !", "Abonné direct",
+      "Force à toi !", "Live de fou !", "Trop drôle", "Tu m'as tué 😂",
+      "Le son est trop bien", "Replay quand ?", "Tu mérites plus de vues !",
+      "T'es une légende", "Je like sans hésiter", "C'est validé 🔥", "Le roi du live"
+    ];
 
-  const commentsContainer = document.getElementById('comments');
-
-  // On insère tous les commentaires en boucle, 2 fois pour que le scroll soit fluide
-  function initComments() {
-    for (let i=0; i<2; i++) {
-      commentsList.forEach(text => {
-        const div = document.createElement('div');
-        div.className = 'comment';
-        div.textContent = text;
-        commentsContainer.appendChild(div);
-      });
+    const listeCommentaires = document.getElementById('liste-commentaires');
+    let indexCommentaire = 0;
+    function ajouterCommentaire() {
+      const div = document.createElement('div');
+      div.className = 'comment';
+      div.textContent = commentaires[indexCommentaire % commentaires.length];
+      listeCommentaires.appendChild(div);
+      if (listeCommentaires.children.length > 15) {
+        listeCommentaires.removeChild(listeCommentaires.children[0]);
+      }
+      indexCommentaire++;
     }
-  }
+    setInterval(ajouterCommentaire, 1000);
 
-  // Scroll vertical des commentaires (auto)
-  function autoScroll() {
-    commentsContainer.scrollTop += 1;
-    // Quand on arrive en bas, on revient en haut
-    if (commentsContainer.scrollTop >= commentsContainer.scrollHeight / 2) {
-      commentsContainer.scrollTop = 0;
+    // Compteurs avec accélération progressive
+    let vues = 0;
+    let likes = 0;
+    let vueSpeed = 1;
+    let likeSpeed = 1;
+
+    function updateStats() {
+      if (vues < 25000) vues += vueSpeed;
+      else if (vues < 100000) vues += 1000;
+      else if (vues < 2065000) vues += 50000;
+      else if (vues < 10000000) vues += 100000;
+      else vues = 10000000;
+
+      if (likes < 10000) likes += likeSpeed;
+      else if (likes < 100000) likes += 2000;
+      else if (likes < 2000000) likes += 10000;
+      else likes = 2000000;
+
+      document.getElementById('vues').textContent = `Vues : ${vues.toLocaleString()}`;
+      document.getElementById('likes').textContent = `Likes : ${likes.toLocaleString()}`;
     }
-  }
-
-  initComments();
-  setInterval(autoScroll, 80);
-
-  // Gestion des vues et likes avec accélération et sauts
-
-  const viewsElem = document.getElementById('views');
-  const likesElem = document.getElementById('likes');
-
-  // Valeurs initiales
-  let views = 1000;
-  let likes = 1000;
-
-  function updateViews() {
-    if (views < 25000) {
-      // Lent, +1 à +3
-      views += Math.floor(Math.random() * 3) + 1;
-    } else if (views >= 25000 && views < 40000) {
-      // Saut rapide
-      views += 15000;
-    } else if (views >= 40000 && views < 50000) {
-      views += 3000;
-    } else if (views >= 50000 && views < 100000) {
-      views += 10000;
-    } else if (views >= 100000 && views < 1000000) {
-      views += 50000;
-    } else if (views >= 1000000 && views < 2065000) {
-      views += 10000;
-    } else if (views >= 2065000 && views < 10000000) {
-      views += 100000;
-    }
-    if (views > 10000000) views = 10000000;
-  }
-
-  function updateLikes() {
-    if (likes < 10000) {
-      likes += Math.floor(Math.random() * 3) + 1;
-    } else if (likes >= 10000 && likes < 2000000) {
-      likes += Math.floor(Math.random() * 50000) + 10000;
-    }
-    if (likes > 2000000) likes = 2000000;
-  }
-
-  function updateStats() {
-    updateViews();
-    updateLikes();
-    viewsElem.textContent = views.toLocaleString('fr-FR') + " vues";
-    likesElem.textContent = likes.toLocaleString('fr-FR') + " likes";
-  }
-
-  setInterval(updateStats, 1500);
-
-</script>
-
+    setInterval(updateStats, 100);
+  </script>
 </body>
 </html>
